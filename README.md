@@ -11,3 +11,6 @@ It provides a unified API for working with UDP sockets, addresses, and buffers w
 - ✅ Support for scatter/gather I/O (`sendmsg`, `recvmsg` on Unix, `WSASendTo`/`WSARecvFrom` on Windows)  
 - ✅ Non-blocking mode support  
 - ✅ Clean initialization/cleanup (`yarnet_socket_initialize`, `yarnet_socket_deinitialize`)
+
+## Notes
+You have to link "ws2_32.lib" on windows
