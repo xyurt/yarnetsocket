@@ -267,9 +267,6 @@ yarnet_bool  yarnet_socket_receive(YarnetSocket sockfd, YarnetAddress *out_addre
     if (ret < 0) {
         *out_receive_length = 0;
 
-        if (errno == EWOULDBLOCK || errno == EAGAIN) {
-            return yarnet_true;
-        }
         return yarnet_false;
     }
 
@@ -310,9 +307,6 @@ yarnet_bool  yarnet_socket_send(YarnetSocket sockfd, const YarnetAddress *addres
     if (ret < 0) {
         *out_sent_length = 0;
 
-        if (errno == EWOULDBLOCK || errno == EAGAIN) {
-            return yarnet_true;
-        }
         return yarnet_false;
     }
 
@@ -614,5 +608,6 @@ yarnet_bool  yarnet_socket_wait(YarnetSocket sockfd, YarnetSocketWait how, Yarne
 
     return yarnet_false;
 }
+
 
 #endif /* _YARNETSOCKET_UNIX */
