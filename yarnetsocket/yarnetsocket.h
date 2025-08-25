@@ -50,8 +50,10 @@ typedef unsigned char yarnet_bool;
 /* Macros */
 #if defined(_YARNETSOCKET_WIN32) 
     #define SOCKET_IS_INVALID(yarnet_socket) ((yarnet_socket) == INVALID_SOCKET)
+    #define YARNET_INVALID_SOCKET INVALID_SOCKET
 #elif defined(_YARNETSOCKET_UNIX)
     #define SOCKET_IS_INVALID(yarnet_socket) ((yarnet_socket) < 0)
+    #define YARNET_INVALID_SOCKET -1
 #endif /* _YARNETSOCKET_WIN32 && _YARNETSOCKET_UNIX */
 
 /* Structs */
@@ -143,5 +145,6 @@ YarnetSocket yarnet_socket_accept(YarnetSocket sockfd, YarnetAddress *out_addres
 yarnet_bool  yarnet_socket_connect(YarnetSocket sockfd, const YarnetAddress *address);
 
 yarnet_bool  yarnet_socket_wait(YarnetSocket sockfd, YarnetSocketWait how, YarnetSocketWait *out_how, int timeout_ms);
+
 
 #endif /* _YARNETSOCKET_H */
