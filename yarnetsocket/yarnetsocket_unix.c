@@ -1,16 +1,18 @@
 #include "yarnetsocket.h"
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <string.h>
 
 int yarnet_socket_initialize() {
-	WSADATA wsadata;
-	return WSAStartup(MAKEWORD(2, 2), &wsadata) == 0;
+	return 1;
 }
 int yarnet_socket_cleanup() {
-	return WSACleanup() == 0;
+	return 1;
 }
 
 yarnet_socket yarnet_socket_ipv4() {
@@ -23,18 +25,18 @@ int yarnet_socket_close(yarnet_socket sockfd) {
 	if (yarnet_socket_is_invalid(sockfd)) {
 		return 0;
 	}
-	return closesocket(sockfd) == 0;
+	return close(sockfd) == 0;
 }
 
 int yarnet_socket_is_invalid(yarnet_socket sockfd) {
-	return sockfd == INVALID_SOCKET;
+	return sockfd < 0;
 }
 
 int yarnet_socket_bind(yarnet_socket sockfd, yarnet_address address) {
 	struct sockaddr_storage *address_p;
 	int result;
 	struct sockaddr_storage bind_address;
-	int name_len;
+	socklen_t name_len;
 	address_p = (struct sockaddr_storage *)address;
 	if (yarnet_socket_is_invalid(sockfd) || address == NULL || (address_p->ss_family != AF_INET && address_p->ss_family != AF_INET6)) {
 		return 0;
@@ -60,15 +62,15 @@ int yarnet_socket_send(yarnet_socket sockfd, const char *buffer, unsigned long l
 	if (yarnet_socket_is_invalid(sockfd) || (buffer == NULL && length != 0) || address == NULL || (address_p->ss_family != AF_INET && address_p->ss_family != AF_INET6)) {
 		return -1;
 	}
-	return sendto(sockfd, buffer, (int)length, flags, (const struct sockaddr *)address_p, address_p->ss_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6));
+	return sendto(sockfd, buffer, length, flags, (const struct sockaddr *)address_p, address_p->ss_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6));
 }
 int yarnet_socket_recv(yarnet_socket sockfd, char *buffer, unsigned long long length, int flags, yarnet_address address) {
-	int from_len;
+	socklen_t from_len;
 	if (yarnet_socket_is_invalid(sockfd) || (buffer == NULL && length != 0)) {
 		return -1;
 	}
 	from_len = sizeof(struct sockaddr_storage);
-	return recvfrom(sockfd, buffer, (int)length, flags, (struct sockaddr *)address, address == NULL ? NULL : &from_len);
+	return recvfrom(sockfd, buffer, length, flags, (struct sockaddr *)address, address == NULL ? NULL : &from_len);
 }
 
 int yarnet_socket_wait(yarnet_socket sockfd, unsigned long long timeout_ms) {
@@ -82,7 +84,7 @@ int yarnet_socket_wait(yarnet_socket sockfd, unsigned long long timeout_ms) {
 	tv.tv_usec = (timeout_ms % 1000) * 1000;
 	FD_ZERO(&read_set);
 	FD_SET(sockfd, &read_set);
-	result = select(0, &read_set, NULL, NULL, &tv);
+	result = select(sockfd + 1, &read_set, NULL, NULL, &tv);
 	if (result != 0 && result != 1) {
 		return -1;
 	}

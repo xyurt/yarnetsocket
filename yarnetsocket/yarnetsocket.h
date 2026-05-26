@@ -22,7 +22,7 @@ int yarnet_socket_wait(yarnet_socket sockfd, unsigned long long timeout_ms);
 
 int yarnet_address_set_ipv4(yarnet_address address, const char *ip, unsigned short port);
 int yarnet_address_set_ipv6(yarnet_address address, const char *ip, unsigned short port);
-int yarnet_address_get_ip(yarnet_address address, char *buffer, unsigned long long *length); /* length input is the capacity of buffer and then set to the result length as output */
+int yarnet_address_get_ip(yarnet_address address, char *buffer, unsigned long long *length); /* length input is the capacity of buffer and then set to the result length as output, no null termination */
 int yarnet_address_get_port(yarnet_address address, unsigned short *port);
 int yarnet_address_copy(yarnet_address dest, yarnet_address src);
 
